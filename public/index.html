@@ -4,14 +4,28 @@
 <div id="app-1">{{ message }}
     <input type="text" v-model="message" />
     <br>
+    <button @click="putMessage()">追加</button>
+    <div v-for="talk in talks">{{talk.message}}</div>
 </div>
 <script>
     var app1 = new Vue({
         el: '#app-1',                        /* #app-1 要素に対して Vue を適用する */
-        data: { message: 'Hello world!' }    /* message という名前のデータを定義する */
-        ,async mounted(){
+        data: {
+            message: 'Hello world!',
+            talks: ["メッセージ１", "メッセージ2", "メッセージ3"]
+        }
+        , async mounted() {
             var response = await axios.get("/api/account");
             this.message = response.data.name
+            var talkResponse = await axios.get("/api/talks");
+            this.talks = talkResponse.data
+        },
+        methods: {
+            async putMessage() {
+                await axios.post("/api/talks", {talk:this.message});
+                this.talks.push(this.message);
+                this.message = "";
+            }
         }
     })
 </script>
